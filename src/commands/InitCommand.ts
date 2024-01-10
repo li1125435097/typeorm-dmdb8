@@ -191,6 +191,16 @@ export class InitCommand implements yargs.CommandModule {
                     "sid": "xe.oracle.docker",
                 });
                 break;
+            case "dmdb":
+                Object.assign(options, {
+                    "type": "dmdb",
+                    "host": "localhost",
+                    "username": "system",
+                    "password": "system",
+                    "database": "system",
+                    "port": 5236,
+                });
+                break;
             case "mongodb":
                 Object.assign(options, {
                     "type": "mongodb",
@@ -520,6 +530,9 @@ services:
             case "oracle":
                 throw new TypeORMError(`You cannot initialize a project with docker for Oracle driver yet.`); // todo: implement for oracle as well
 
+            case "dmdb":
+                throw new TypeORMError(`You cannot initialize a project with docker for Dmdb driver yet.`); // todo: implement for dmdb as well
+
             case "mssql":
                 return `version: '3'
 services:
@@ -608,6 +621,9 @@ Steps to run this project:
                 break;
             case "oracle":
                 packageJson.dependencies["oracledb"] = "^1.13.1";
+                break;
+            case "dmdb":
+                packageJson.dependencies["dmdb"] = "^1.0.10728";
                 break;
             case "mssql":
                 packageJson.dependencies["mssql"] = "^4.0.4";

@@ -18,6 +18,7 @@ import {ClosureSubjectExecutor} from "./tree/ClosureSubjectExecutor";
 import {MaterializedPathSubjectExecutor} from "./tree/MaterializedPathSubjectExecutor";
 import {OrmUtils} from "../util/OrmUtils";
 import { UpdateResult } from "../query-builder/result/UpdateResult";
+import { DmdbDriver } from "../driver/dmdb/DmdbDriver";
 
 /**
  * Executes all database operations (inserts, updated, deletes) that must be executed
@@ -271,7 +272,7 @@ export class SubjectExecutor {
                     bulkInsertSubjects.push(subject);
                     bulkInsertMaps.push(subject.entity!);
                 });
-            } else if (this.queryRunner.connection.driver instanceof OracleDriver) {
+            } else if (this.queryRunner.connection.driver instanceof OracleDriver || this.queryRunner.connection.driver instanceof DmdbDriver) {
                 subjects.forEach(subject => {
                     singleInsertSubjects.push(subject);
                 });
@@ -285,6 +286,7 @@ export class SubjectExecutor {
                     if (subject.changeMaps.length === 0 ||
                         subject.metadata.treeType ||
                         this.queryRunner.connection.driver instanceof OracleDriver ||
+                        this.queryRunner.connection.driver instanceof DmdbDriver ||
                         this.queryRunner.connection.driver instanceof SapDriver) {
                         singleInsertSubjects.push(subject);
 

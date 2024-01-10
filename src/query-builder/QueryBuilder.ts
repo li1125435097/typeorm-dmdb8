@@ -26,6 +26,7 @@ import {TypeORMError} from "../error";
 import {WhereClause, WhereClauseCondition} from "./WhereClause";
 import {NotBrackets} from "./NotBrackets";
 import {ReturningType} from "../driver/Driver";
+import { DmdbDriver } from "../driver/dmdb/DmdbDriver";
 
 // todo: completely cover query builder with tests
 // todo: entityOrProperty can be target name. implement proper behaviour if it is.
@@ -769,6 +770,12 @@ export abstract class QueryBuilder<Entity> {
             if (driver instanceof OracleDriver) {
                 columnsExpression += " INTO " + columns.map(column => {
                     return this.createParameter({ type: driver.columnTypeToNativeParameter(column.type), dir: driver.oracle.BIND_OUT });
+                }).join(", ");
+            }
+
+            if (driver instanceof DmdbDriver) {
+                columnsExpression += " INTO " + columns.map(column => {
+                    return this.createParameter({ type: driver.columnTypeToNativeParameter(column.type), dir: driver.dmdb.BIND_OUT });
                 }).join(", ");
             }
 

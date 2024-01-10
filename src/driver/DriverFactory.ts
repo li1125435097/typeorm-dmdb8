@@ -3,6 +3,7 @@ import {CockroachDriver} from "./cockroachdb/CockroachDriver";
 import {MongoDriver} from "./mongodb/MongoDriver";
 import {SqlServerDriver} from "./sqlserver/SqlServerDriver";
 import {OracleDriver} from "./oracle/OracleDriver";
+import { DmdbDriver } from "./dmdb/DmdbDriver";
 import {SqliteDriver} from "./sqlite/SqliteDriver";
 import {CordovaDriver} from "./cordova/CordovaDriver";
 import {ReactNativeDriver} from "./react-native/ReactNativeDriver";
@@ -54,6 +55,8 @@ export class DriverFactory {
                 return new SqljsDriver(connection);
             case "oracle":
                 return new OracleDriver(connection);
+            case "dmdb":
+                return new DmdbDriver(connection);
             case "mssql":
                 return new SqlServerDriver(connection);
             case "mongodb":
@@ -83,6 +86,7 @@ export class DriverFactory {
                         "mysql",
                         "nativescript",
                         "oracle",
+                        "dmdb",
                         "postgres",
                         "react-native",
                         "sap",

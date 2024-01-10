@@ -4,6 +4,7 @@ import {ObjectLiteral} from "../common/ObjectLiteral";
 import {QueryExpressionMap} from "./QueryExpressionMap";
 import {OracleDriver} from "../driver/oracle/OracleDriver";
 import { TypeORMError } from "../error";
+import { DmdbDriver } from "../driver/dmdb/DmdbDriver";
 
 /**
  * Allows to work with entity relations and perform specific operations with those relations.
@@ -119,7 +120,7 @@ export class RelationUpdater {
 
             if (!bulkInserted.length) return;
 
-            if (this.queryBuilder.connection.driver instanceof OracleDriver || this.queryBuilder.connection.driver instanceof SapDriver) {
+            if (this.queryBuilder.connection.driver instanceof OracleDriver || this.queryBuilder.connection.driver instanceof SapDriver || this.queryBuilder.connection.driver instanceof DmdbDriver) {
                 await Promise.all(bulkInserted.map(value => {
                     return this.queryBuilder
                         .createQueryBuilder()

@@ -8,6 +8,7 @@ import {Connection} from "../connection/Connection";
 import {OracleDriver} from "../driver/oracle/OracleDriver";
 import {AuroraDataApiDriver} from "../driver/aurora-data-api/AuroraDataApiDriver";
 import { TypeORMError } from "../error";
+import { DmdbDriver } from "../driver/dmdb/DmdbDriver";
 
 /**
  * Builds join column for the many-to-one and one-to-one owner relations.
@@ -77,7 +78,7 @@ export class RelationJoinColumnBuilder {
         });
 
         // Oracle does not allow both primary and unique constraints on the same column
-        if (this.connection.driver instanceof OracleDriver && columns.every(column => column.isPrimary))
+        if ((this.connection.driver instanceof OracleDriver || this.connection.driver instanceof DmdbDriver) && columns.every(column => column.isPrimary))
             return { foreignKey, columns, uniqueConstraint: undefined };
 
         // CockroachDB requires UNIQUE constraints on referenced columns

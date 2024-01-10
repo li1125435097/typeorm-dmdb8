@@ -20,6 +20,7 @@ import {AuroraDataApiDriver} from "../driver/aurora-data-api/AuroraDataApiDriver
 import {TypeORMError} from "../error";
 import {v4 as uuidv4} from "uuid";
 import { InsertOrUpdateOptions } from "./InsertOrUpdateOptions";
+import { DmdbDriver } from "../driver/dmdb/DmdbDriver";
 
 /**
  * Allows to build complex sql queries in a fashion way and execute those queries.
@@ -99,7 +100,7 @@ export class InsertQueryBuilder<Entity> extends QueryBuilder<Entity> {
             }
 
             if (this.expressionMap.updateEntity === true && this.expressionMap.mainAlias!.hasMetadata) {
-                if (!(valueSets.length > 1 && this.connection.driver instanceof OracleDriver)) {
+                if (!(valueSets.length > 1 && (this.connection.driver instanceof OracleDriver || this.connection.driver instanceof DmdbDriver))) {
                     this.expressionMap.extraReturningColumns = returningResultsEntityUpdator.getInsertionReturningColumns();
                 }
 
@@ -322,7 +323,7 @@ export class InsertQueryBuilder<Entity> extends QueryBuilder<Entity> {
         const tableName = this.getTableName(this.getMainTableName());
         const valuesExpression = this.createValuesExpression(); // its important to get values before returning expression because oracle rely on native parameters and ordering of them is important
         const returningExpression =
-            (this.connection.driver instanceof OracleDriver && this.getValueSets().length > 1)
+            ((this.connection.driver instanceof OracleDriver || this.connection.driver instanceof DmdbDriver) && this.getValueSets().length > 1)
                 ? null
                 : this.createReturningExpression("insert"); // oracle doesnt support returning with multi-row insert
         const columnsExpression = this.createColumnNamesExpression();
@@ -349,7 +350,7 @@ export class InsertQueryBuilder<Entity> extends QueryBuilder<Entity> {
 
         // add VALUES expression
         if (valuesExpression) {
-            if (this.connection.driver instanceof OracleDriver && this.getValueSets().length > 1) {
+            if ((this.connection.driver instanceof OracleDriver || this.connection.driver instanceof DmdbDriver) && this.getValueSets().length > 1) {
                 query += ` ${valuesExpression}`;
             } else {
                 query += ` VALUES ${valuesExpression}`;
@@ -417,7 +418,8 @@ export class InsertQueryBuilder<Entity> extends QueryBuilder<Entity> {
         if (
             returningExpression &&
             (this.connection.driver instanceof PostgresDriver ||
-                this.connection.driver instanceof OracleDriver ||
+                this.connection.driver instanceof OracleDriver || 
+                this.connection.driver instanceof DmdbDriver ||
                 this.connection.driver instanceof CockroachDriver ||
                 this.connection.driver instanceof MysqlDriver)
         ) {
@@ -502,7 +504,7 @@ export class InsertQueryBuilder<Entity> extends QueryBuilder<Entity> {
             valueSets.forEach((valueSet, valueSetIndex) => {
                 columns.forEach((column, columnIndex) => {
                     if (columnIndex === 0) {
-                        if (this.connection.driver instanceof OracleDriver && valueSets.length > 1) {
+                        if ((this.connection.driver instanceof OracleDriver || this.connection.driver instanceof DmdbDriver) && valueSets.length > 1) {
                             expression += " SELECT ";
                         } else if (this.connection.driver instanceof SapDriver && valueSets.length > 1) {
                                 expression += " SELECT ";
@@ -567,7 +569,7 @@ export class InsertQueryBuilder<Entity> extends QueryBuilder<Entity> {
 
                         // if value for this column was not provided then insert default value
                     } else if (value === undefined) {
-                        if ((this.connection.driver instanceof OracleDriver && valueSets.length > 1) || this.connection.driver instanceof AbstractSqliteDriver || this.connection.driver instanceof SapDriver) { // unfortunately sqlite does not support DEFAULT expression in INSERT queries
+                        if (((this.connection.driver instanceof OracleDriver || this.connection.driver instanceof DmdbDriver) && valueSets.length > 1) || this.connection.driver instanceof AbstractSqliteDriver || this.connection.driver instanceof SapDriver) { // unfortunately sqlite does not support DEFAULT expression in INSERT queries
                             if (column.default !== undefined && column.default !== null) { // try to use default defined in the column
                                 expression += this.connection.driver.normalizeDefault(column);
                             } else {
@@ -617,7 +619,7 @@ export class InsertQueryBuilder<Entity> extends QueryBuilder<Entity> {
 
                     if (columnIndex === columns.length - 1) {
                         if (valueSetIndex === valueSets.length - 1) {
-                            if (this.connection.driver instanceof OracleDriver && valueSets.length > 1) {
+                            if ((this.connection.driver instanceof OracleDriver || this.connection.driver instanceof DmdbDriver) && valueSets.length > 1) {
                                 expression += " FROM DUAL ";
                             } else if (this.connection.driver instanceof SapDriver && valueSets.length > 1) {
                                 expression += " FROM dummy ";
@@ -625,7 +627,7 @@ export class InsertQueryBuilder<Entity> extends QueryBuilder<Entity> {
                                 expression += ")";
                             }
                         } else {
-                            if (this.connection.driver instanceof OracleDriver && valueSets.length > 1) {
+                            if ((this.connection.driver instanceof OracleDriver || this.connection.driver instanceof DmdbDriver) && valueSets.length > 1) {
                                 expression += " FROM DUAL UNION ALL ";
                             } else if (this.connection.driver instanceof SapDriver && valueSets.length > 1) {
                                 expression += " FROM dummy UNION ALL ";
@@ -661,7 +663,7 @@ export class InsertQueryBuilder<Entity> extends QueryBuilder<Entity> {
 
                     // if value for this column was not provided then insert default value
                     } else if (value === undefined) {
-                        if (this.connection.driver instanceof AbstractSqliteDriver || this.connection.driver instanceof SapDriver) {
+                        if (this.connection.driver instanceof AbstractSqliteDriver || this.connection.driver instanceof SapDriver || this.connection.driver instanceof DmdbDriver) {
                             expression += "NULL";
 
                         } else {

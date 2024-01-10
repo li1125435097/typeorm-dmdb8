@@ -4,6 +4,7 @@ import {PostgresConnectionOptions} from "../driver/postgres/PostgresConnectionOp
 import {SqliteConnectionOptions} from "../driver/sqlite/SqliteConnectionOptions";
 import {SqlServerConnectionOptions} from "../driver/sqlserver/SqlServerConnectionOptions";
 import {OracleConnectionOptions} from "../driver/oracle/OracleConnectionOptions";
+import {DmdbConnectionOptions} from "../driver/dmdb/DmdbConnectionOptions";
 import {MongoConnectionOptions} from "../driver/mongodb/MongoConnectionOptions";
 import {CordovaConnectionOptions} from "../driver/cordova/CordovaConnectionOptions";
 import {SqljsConnectionOptions} from "../driver/sqljs/SqljsConnectionOptions";
@@ -39,4 +40,5 @@ export type ConnectionOptions =
     AuroraDataApiPostgresConnectionOptions|
     ExpoConnectionOptions|
     BetterSqlite3ConnectionOptions |
+    DmdbConnectionOptions|
     CapacitorConnectionOptions;

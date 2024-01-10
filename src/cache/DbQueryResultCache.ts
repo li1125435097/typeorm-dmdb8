@@ -1,5 +1,6 @@
 import {ObjectLiteral} from "../common/ObjectLiteral";
 import {Connection} from "../connection/Connection";
+import { DmdbDriver } from "../driver/dmdb/DmdbDriver";
 import {OracleDriver} from "../driver/oracle/OracleDriver";
 import {MssqlParameter} from "../driver/sqlserver/MssqlParameter";
 import {SqlServerDriver} from "../driver/sqlserver/SqlServerDriver";
@@ -131,7 +132,7 @@ export class DbQueryResultCache implements QueryResultCache {
                 .getRawOne();
 
         } else if (options.query) {
-            if (this.connection.driver instanceof OracleDriver) {
+            if (this.connection.driver instanceof OracleDriver || this.connection.driver instanceof DmdbDriver) {
                 return qb
                     .where(`dbms_lob.compare(${qb.escape("cache")}.${qb.escape("query")}, :query) = 0`, { query: options.query })
                     .getRawOne();
@@ -190,7 +191,7 @@ export class DbQueryResultCache implements QueryResultCache {
                 .update(this.queryResultCacheTable)
                 .set(insertedValues);
 
-            if (this.connection.driver instanceof OracleDriver) {
+            if (this.connection.driver instanceof OracleDriver || this.connection.driver instanceof DmdbDriver) {
                 qb.where(`dbms_lob.compare("query", :condition) = 0`, { condition: insertedValues.query });
 
             } else {

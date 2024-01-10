@@ -9,6 +9,7 @@ import {RelationMetadata} from "../metadata/RelationMetadata";
 import {AuroraDataApiDriver} from "../driver/aurora-data-api/AuroraDataApiDriver";
 import {OracleDriver} from "../driver/oracle/OracleDriver";
 import { TypeORMError } from "../error";
+import { DmdbDriver } from "../driver/dmdb/DmdbDriver";
 
 /**
  * Creates EntityMetadata for junction tables.
@@ -152,7 +153,8 @@ export class JunctionEntityMetadataBuilder {
                 columns: junctionColumns,
                 referencedColumns: referencedColumns,
                 onDelete: relation.onDelete || "CASCADE",
-                onUpdate: this.connection.driver instanceof OracleDriver ? "NO ACTION" : relation.onUpdate || "CASCADE",
+                onUpdate: this.connection.driver instanceof OracleDriver || this.connection.driver instanceof DmdbDriver
+                ? "NO ACTION" : relation.onUpdate || "CASCADE",
             }),
             new ForeignKeyMetadata({
                 entityMetadata: entityMetadata,
@@ -160,7 +162,7 @@ export class JunctionEntityMetadataBuilder {
                 columns: inverseJunctionColumns,
                 referencedColumns: inverseReferencedColumns,
                 onDelete: relation.inverseRelation ? relation.inverseRelation.onDelete : "CASCADE",
-                onUpdate: this.connection.driver instanceof OracleDriver
+                onUpdate: this.connection.driver instanceof OracleDriver || this.connection.driver instanceof DmdbDriver
                     ? "NO ACTION"
                     : relation.inverseRelation
                         ? relation.inverseRelation.onUpdate

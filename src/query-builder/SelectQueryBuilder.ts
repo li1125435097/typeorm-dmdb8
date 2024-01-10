@@ -38,6 +38,7 @@ import {AuroraDataApiDriver} from "../driver/aurora-data-api/AuroraDataApiDriver
 import {CockroachDriver} from "../driver/cockroachdb/CockroachDriver";
 import {EntityNotFoundError} from "../error/EntityNotFoundError";
 import { TypeORMError } from "../error";
+import { DmdbDriver } from "../driver/dmdb/DmdbDriver";
 
 /**
  * Allows to build complex sql queries in a fashion way and execute those queries.
@@ -1727,7 +1728,7 @@ export class SelectQueryBuilder<Entity> extends QueryBuilder<Entity> implements 
                 } else if (driver instanceof PostgresDriver) {
                     return " FOR SHARE" + lockTablesClause;
 
-                } else if (driver instanceof OracleDriver) {
+                } else if (driver instanceof OracleDriver || driver instanceof DmdbDriver) {
                     return " FOR UPDATE";
 
                 } else if (driver instanceof SqlServerDriver) {
@@ -1737,7 +1738,7 @@ export class SelectQueryBuilder<Entity> extends QueryBuilder<Entity> implements 
                     throw new LockNotSupportedOnGivenDriverError();
                 }
             case "pessimistic_write":
-                if (driver instanceof MysqlDriver || driver instanceof AuroraDataApiDriver || driver instanceof OracleDriver) {
+                if (driver instanceof MysqlDriver || driver instanceof AuroraDataApiDriver || driver instanceof OracleDriver || driver instanceof DmdbDriver) {
                     return " FOR UPDATE";
 
                 }
