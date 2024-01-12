@@ -1,13 +1,13 @@
 {
-  "name": "typeorm",
-  "private": true,
-  "version": "0.2.45",
-  "description": "Data-Mapper ORM for TypeScript, ES7, ES6, ES5. Supports MySQL, PostgreSQL, MariaDB, SQLite, MS SQL Server, Oracle, MongoDB databases.",
+  "name": "typeorm-dmdb8",
+  "private": false,
+  "version": "0.4.0",
+  "description": "Data-Mapper ORM for TypeScript, ES7, ES6, ES5. Supports MySQL, PostgreSQL, MariaDB, Dmdb, SQLite, MS SQL Server, Oracle, MongoDB databases.",
   "license": "MIT",
   "readmeFilename": "README.md",
   "author": {
     "name": "Umed Khudoiberdiev",
-    "email": "pleerock.me@gmail.com"
+    "email": "3162853966@qq.com"
   },
   "exports": {
     ".": {
@@ -56,10 +56,10 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/typeorm/typeorm.git"
+    "url": "https://github.com/li1125435097/typeorm-dmdb8.git"
   },
   "bugs": {
-    "url": "https://github.com/typeorm/typeorm/issues"
+    "url": "https://github.com/li1125435097/typeorm-dmdb8/issues"
   },
   "tags": [
     "orm",
@@ -70,6 +70,8 @@
     "postgresql",
     "postgresql-orm",
     "mariadb",
+    "dmdb",
+    "dmdb-orm",
     "mariadb-orm",
     "sqlite",
     "sqlite-orm",
@@ -142,6 +144,7 @@
     "hdb-pool": "^0.1.6",
     "ioredis": "^4.28.3",
     "mongodb": "^3.6.0",
+    "dmdb": "^1.0.19862",
     "mssql": "^6.3.1",
     "mysql2": "^2.2.5",
     "oracledb": "^5.1.0",
@@ -182,6 +185,9 @@
       "optional": true
     },
     "pg-native": {
+      "optional": true
+    },
+    "dmdb": {
       "optional": true
     },
     "pg-query-stream": {
@@ -229,6 +235,7 @@
     "test": "rimraf ./build && tsc && mocha --file ./build/compiled/test/utils/test-setup.js --bail --recursive --timeout 60000 ./build/compiled/test",
     "test-fast": "mocha --file ./build/compiled/test/utils/test-setup.js --bail --recursive --timeout 60000 ./build/compiled/test",
     "compile": "rimraf ./build && tsc",
+    "c": "rimraf ./build && tsc",
     "watch": "./node_modules/.bin/tsc -w",
     "package": "gulp package",
     "pack": "gulp pack",

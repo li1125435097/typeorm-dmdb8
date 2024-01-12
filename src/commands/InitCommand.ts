@@ -623,7 +623,7 @@ Steps to run this project:
                 packageJson.dependencies["oracledb"] = "^1.13.1";
                 break;
             case "dmdb":
-                packageJson.dependencies["dmdb"] = "^1.0.10728";
+                packageJson.dependencies["dmdb"] = "^1.0.19862";
                 break;
             case "mssql":
                 packageJson.dependencies["mssql"] = "^4.0.4";

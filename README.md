@@ -3,22 +3,37 @@
     <img src="https://github.com/typeorm/typeorm/raw/master/resources/logo_big.png" width="492" height="228">
   </a>
   <br>
-  <br>
-	<a href="https://app.circleci.com/pipelines/github/typeorm/typeorm">
-		<img src="https://circleci.com/gh/typeorm/typeorm/tree/master.svg?style=shield">
-	</a>
-	<a href="https://badge.fury.io/js/typeorm">
-		<img src="https://badge.fury.io/js/typeorm.svg">
-	</a>
-    <a href="https://codecov.io/gh/typeorm/typeorm">
-        <img alt="Codecov" src="https://img.shields.io/codecov/c/github/typeorm/typeorm.svg">
-    </a>
-	<a href="https://join.slack.com/t/typeorm/shared_invite/zt-uu12ljeb-OH_0086I379fUDApYJHNuw">
-		<img src="https://img.shields.io/badge/chat-on%20slack-blue.svg">
-	</a>
-  <br>
-  <br>
 </div>
+
+## typeorm达梦定制版介绍
+
++ typeorm-dmdb8基于typeorm@0.2.45版本开发，驱动及实现基于oracle模块开发。提供达梦数据库v8版本驱动，可以操作达梦数据库v8，其接入跟mysql和oracle差不多
+
++ 基于typeorm的项目可用以下安装 `npm install typeorm@npm:typeorm-dmdb8`
+
++ class DmdbQueryRunner.log 为调试日志，如果需自定义对接其他达梦可开启调试日志
+
++ 新增或改动的文件
+driver/dmdb/DmdbDriver.ts
+driver/dmdb/DmdbConnectionCredentialsOptions.ts
+driver/dmdb/DmdbConnectionOptions.ts
+driver/dmdb/DmdbQueryRunner.ts
+driver/DriverFactory.ts
+cache/DbQueryResultCache.ts
+metadata-builder/JunctionEntityMetadataBuilder.ts
+metadata-builder/RelationJoinColumnBuilder.ts
+platform/PlatformTools.ts
+persistence/SubjectExecutor.ts
+commands/InitCommand.ts
+query-builder/RelationUpdater.ts
+query-builder/ReturningResultsEntityUpdator.ts
+query-builder/SelectQueryBuilder.ts
+query-builder/QueryBuilder.ts
+query-builder/InsertQueryBuilder.ts
+
+
+
+
 
 TypeORM is an [ORM](https://en.wikipedia.org/wiki/Object-relational_mapping)
 that can run in NodeJS, Browser, Cordova, PhoneGap, Ionic, React Native, NativeScript, Expo, and Electron platforms
