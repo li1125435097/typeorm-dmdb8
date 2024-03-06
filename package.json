@@ -141,10 +141,10 @@
   "peerDependencies": {
     "@sap/hana-client": "^2.11.14",
     "better-sqlite3": "^7.1.2",
+    "dmdb": "^1.0.19862",
     "hdb-pool": "^0.1.6",
     "ioredis": "^4.28.3",
     "mongodb": "^3.6.0",
-    "dmdb": "^1.0.19862",
     "mssql": "^6.3.1",
     "mysql2": "^2.2.5",
     "oracledb": "^5.1.0",
