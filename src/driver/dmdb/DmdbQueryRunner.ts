@@ -32,8 +32,7 @@ export class DmdbQueryRunner extends BaseQueryRunner implements QueryRunner {
     protected databaseConnectionPromise: Promise<any>;
 
     // 调试日志
-    private log = (mark:any, txt:any) => console.log(new Date().toLocaleString(),' [INFO] ',mark,' ',txt)
-    // const log = (mark,txt) => {}
+    private log = (mark:any, txt:any) => (process.env.DMDB_LOG || '1').toLowerCase() === 'true' && console.log(new Date().toLocaleString(),' [INFO] ',mark,' ',txt)
 
     // 构造函数
     constructor(driver: DmdbDriver, mode: ReplicationMode) {
@@ -196,7 +195,7 @@ export class DmdbQueryRunner extends BaseQueryRunner implements QueryRunner {
             // 数据库查询不兼容处理
             const defendResult = await this.queryDefend(query, parameters, err)
             if(defendResult){
-                console.log('\ntypeorm-dmdb8 [info] trigger DmdbQueryRunner defend: ',{query,parameters})
+                this.log('\ntypeorm-dmdb8 [info] trigger DmdbQueryRunner defend: ',{query,parameters})
                 return defendResult
             }
 
@@ -208,12 +207,34 @@ export class DmdbQueryRunner extends BaseQueryRunner implements QueryRunner {
     // 数据库sql语句执行函数钩子
     queryHook(query: string, parameters?: any[]){
         if(!parameters) return false
+        let isReturn = false
+        this.log({query,parameters},'dddddddddddddddddmmmmmmmmmmmmmmm');
+
+        // 参数null值处理
+        const templateChar = query.match(/(\:\d* )|\?/g) || []
+        templateChar.map((v:any,i:number) => {
+            if(parameters[i] === null){
+                query = query.replace(v,'null ')
+                parameters.splice(i,1)
+            }
+            this.log('typeorm-dmdb8 [info] queryHook ',`null替换 ${query}`)
+        })
+
+        // 统计count处理
+        query = query.replace(' as count ',' "count" ')
 
         // 去除别名引号
         query = query.replace(/"[a-zA-Z]"/g, alias => {
-            console.log('typeorm-dmdb8 [info] queryHook ',`别名替换 ${alias} -> ${alias.slice(1,-1)}`)
+            this.log('typeorm-dmdb8 [info] queryHook ',`别名替换 ${alias} -> ${alias.slice(1,-1)}`)
+            isReturn = true
             return alias.slice(1,-1)
         })
+
+        // 反撇号转换
+        if(query.match('`')){
+            query = query.replace(/`/g,'"')
+            isReturn = true
+        }
 
         // in语法处理
         const matchin = query.match(/in\(:\d*\)/g)
@@ -223,10 +244,11 @@ export class DmdbQueryRunner extends BaseQueryRunner implements QueryRunner {
                 query = query.replace(v.slice(3, -1), parameters[v.slice(4,-1) - 1])
                 parameters.splice(v.slice(4,-1) - 1, 1)
             })
-            console.log('typeorm-dmdb8 [info] queryHook ',`in替换 ${oldQuery} -> ${query}}`)
+            this.log('typeorm-dmdb8 [info] queryHook ',`in替换 ${oldQuery} -> ${query}}`)
             return {query, parameters}
         }
         
+        if(isReturn) return { query: query, parameters: parameters };
         return false
     }
 
@@ -244,17 +266,17 @@ export class DmdbQueryRunner extends BaseQueryRunner implements QueryRunner {
         // sql数据库版本处理
         if(query === 'SELECT VERSION() AS version'){
             const version = await this.query("SELECT * FROM v$version;").catch(err => {return false})
-            console.log('typeorm-dmdb8 [info] queryDefend 数据库版本语法纠正')
+            this.log('queryDefend','typeorm-dmdb8 [info] queryDefend 数据库版本语法纠正')
             return [{version:version[1].BANNER}]
         }
         // 删除主键索引处理
         else if(query.startsWith('DROP INDEX "INDEX') || query.startsWith('CREATE UNIQUE INDEX "INDEX')){
-            console.log('typeorm-dmdb8 [info] queryDefend 索引删除或新建纠正 ')
+            this.log('queryDefend','typeorm-dmdb8 [info] queryDefend 索引删除或新建纠正 ')
             return []
         }
         // 达梦数据库错误码处理
         else if(errCodeMap[err.errCode]){
-            console.log('typeorm-dmdb8 [info] queryDefend 达梦数据库错误码',errCodeMap[err.errCode])
+            this.log('queryDefend','typeorm-dmdb8 [info] queryDefend 达梦数据库错误码'+errCodeMap[err.errCode])
             return []
         }
         else return false
@@ -1227,7 +1249,7 @@ export class DmdbQueryRunner extends BaseQueryRunner implements QueryRunner {
 
         // 达梦数据库主键保护
         const indexObj:any = indexOrName
-        if(indexObj.name.startsWith('INDEX')) return console.log(indexObj.name+' 为主键索引，禁止删除！！！')
+        if(indexObj.name.startsWith('INDEX')) return console.error(indexObj.name+' 为主键索引，禁止删除！！！')
 
         const table = tableOrName instanceof Table ? tableOrName : await this.getCachedTable(tableOrName);
         const index = indexOrName instanceof TableIndex ? indexOrName : table.indices.find(i => i.name === indexOrName);

@@ -66,6 +66,8 @@ export class DmdbDriver implements Driver {
         "urowid",
         "text",
         "tinyint",
+        "double",
+        "datetime"
     ];
     spatialTypes: ColumnType[] = [];
     withLengthColumnTypes: ColumnType[] = [
@@ -379,7 +381,7 @@ export class DmdbDriver implements Driver {
             || column.type === "integer" || column.type === "smallint") {
             return "number";
 
-        } else if (column.type === "real" || column.type === "double precision") {
+        } else if (column.type === "real" || column.type === "double precision" || column.type === "double") {
             return "float";
 
         } else if (column.type === String || column.type === "varchar") {
@@ -579,6 +581,7 @@ export class DmdbDriver implements Driver {
             case "dec":
             case "decimal":
             case "tinyint":
+            case "double":
                 return this.dmdb.NUMBER;
             case "char":
             case "nchar":
@@ -591,6 +594,7 @@ export class DmdbDriver implements Driver {
             case "clob":
                 return this.dmdb.CLOB;
             case "date":
+            case "datetime":
             case "timestamp":
             case "timestamp with time zone":
             case "timestamp with local time zone":
